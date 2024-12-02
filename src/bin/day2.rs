@@ -1,5 +1,5 @@
 // Path: src/bin/day2.rs
-fn check(numbers: &[isize]) -> bool {
+fn is_safe(numbers: &[isize]) -> bool {
     let mut numbers = numbers.windows(2);
 
     let first_pair = numbers.next().unwrap();
@@ -10,64 +10,42 @@ fn check(numbers: &[isize]) -> bool {
 
     let is_increasing = first_pair[0] < first_pair[1];
 
-    for pair in numbers {
+    numbers.all(|pair| {
         let diff = (pair[0] - pair[1]).abs();
-
-        if !(1..=3).contains(&diff) {
-            return false;
-        } else if is_increasing {
-            if pair[0] > pair[1] {
-                return false;
-            }
-        } else if pair[0] < pair[1] {
-            return false;
-        }
-    }
-
-    true
+        (1..=3).contains(&diff) && (is_increasing == (pair[0] < pair[1]))
+    })
 }
+
+fn to_level(line: &str) -> Vec<isize> {
+    line.split_whitespace()
+        .flat_map(str::parse::<isize>)
+        .collect::<Vec<_>>()
+}
+
 fn part1(input: &str) -> usize {
-    let mut sum = 0;
-
-    for line in input.lines() {
-        let numbers: Vec<isize> = line
-            .split_whitespace()
-            .flat_map(str::parse::<isize>)
-            .collect();
-
-        if check(&numbers) {
-            sum += 1;
-        }
-    }
-
-    sum
+    input
+        .lines()
+        .map(to_level)
+        .filter(|numbers| is_safe(numbers))
+        .count()
 }
 
 fn part2(input: &str) -> usize {
-    let mut sum = 0;
+    input
+        .lines()
+        .map(to_level)
+        .filter(|numbers| {
+            if is_safe(numbers) {
+                return true;
+            }
 
-    for line in input.lines() {
-        let numbers: Vec<isize> = line
-            .split_whitespace()
-            .flat_map(str::parse::<isize>)
-            .collect();
-
-        if check(&numbers) {
-            sum += 1;
-        } else {
-            for i in 0..numbers.len() {
+            (0..numbers.len()).any(|i| {
                 let mut numbers = numbers.clone();
                 numbers.remove(i);
-
-                if check(&numbers) {
-                    sum += 1;
-                    break;
-                }
-            }
-        }
-    }
-
-    sum
+                is_safe(&numbers)
+            })
+        })
+        .count()
 }
 
 fn main() {
