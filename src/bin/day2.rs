@@ -1,8 +1,8 @@
 // Path: src/bin/day2.rs
 fn is_safe(numbers: &[isize]) -> bool {
-    let mut numbers = numbers.windows(2);
+    let mut pairs = numbers.windows(2);
 
-    let first_pair = numbers.next().unwrap();
+    let first_pair = pairs.next().unwrap();
 
     if !(1..=3).contains(&(first_pair[0] - first_pair[1]).abs()) {
         return false;
@@ -10,7 +10,7 @@ fn is_safe(numbers: &[isize]) -> bool {
 
     let is_increasing = first_pair[0] < first_pair[1];
 
-    numbers.all(|pair| {
+    pairs.all(|pair| {
         let diff = (pair[0] - pair[1]).abs();
         (1..=3).contains(&diff) && (is_increasing == (pair[0] < pair[1]))
     })
@@ -35,15 +35,12 @@ fn part2(input: &str) -> usize {
         .lines()
         .map(to_level)
         .filter(|numbers| {
-            if is_safe(numbers) {
-                return true;
-            }
-
-            (0..numbers.len()).any(|i| {
-                let mut numbers = numbers.clone();
-                numbers.remove(i);
-                is_safe(&numbers)
-            })
+            is_safe(numbers)
+                || (0..numbers.len()).any(|i| {
+                    let mut numbers = numbers.clone();
+                    numbers.remove(i);
+                    is_safe(&numbers)
+                })
         })
         .count()
 }

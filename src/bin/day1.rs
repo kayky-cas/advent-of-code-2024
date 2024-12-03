@@ -1,5 +1,7 @@
 // Path: src/bin/day1.rs
 
+use std::collections::HashMap;
+
 fn insert_sorted<T: Ord>(vec: &mut Vec<T>, value: T) {
     let index = match vec.binary_search(&value) {
         Ok(index) => index,
@@ -25,14 +27,13 @@ fn part1(input: &str) -> isize {
     first_column
         .iter()
         .zip(second_column.iter())
-        .fold(0, |acc, (f, s)| acc + (f - s).abs())
+        .map(|(f, s)| (f - s).abs())
+        .sum()
 }
 
 fn part2(input: &str) -> usize {
     let mut first_column = Vec::with_capacity(input.len());
-    let mut second_column = Vec::with_capacity(input.len());
-
-    let mut sum = 0;
+    let mut second_column = HashMap::new();
 
     for line in input.lines() {
         let mut numbers = line.split_whitespace();
@@ -41,18 +42,17 @@ fn part2(input: &str) -> usize {
         let second: usize = numbers.next().unwrap().parse().unwrap();
 
         first_column.push(first);
-        second_column.push(second);
+
+        second_column
+            .entry(second)
+            .and_modify(|e| *e += 1)
+            .or_insert(1);
     }
 
-    for first in first_column.iter() {
-        for second in second_column.iter() {
-            if first == second {
-                sum += first;
-            }
-        }
-    }
-
-    sum
+    first_column
+        .iter()
+        .map(|&f| f * second_column.get(&f).unwrap_or(&0))
+        .sum()
 }
 
 fn main() {
@@ -87,4 +87,3 @@ mod tests {
         assert_eq!(part2(input), 31);
     }
 }
-

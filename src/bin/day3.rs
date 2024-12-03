@@ -7,10 +7,10 @@ static R: OnceLock<regex::Regex> = OnceLock::new();
 fn part1(input: &str) -> usize {
     R.get_or_init(|| regex::Regex::new(r"mul\((\d+),(\d+)\)").unwrap())
         .captures_iter(input)
-        .filter_map(|cap| {
-            let a = cap[1].parse::<usize>().ok();
-            let b = cap[2].parse::<usize>().ok();
-            Some(a? * b?)
+        .map(|cap| {
+            let a = cap[1].parse::<usize>().unwrap();
+            let b = cap[2].parse::<usize>().unwrap();
+            a * b
         })
         .sum()
 }
