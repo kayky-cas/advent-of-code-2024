@@ -45,13 +45,13 @@ fn part2(input: &str) -> usize {
 
         second_column
             .entry(second)
-            .and_modify(|e| *e += 1)
-            .or_insert(1);
+            .and_modify(|e| *e += second)
+            .or_insert(second);
     }
 
     first_column
         .iter()
-        .map(|&f| f * second_column.get(&f).unwrap_or(&0))
+        .flat_map(|&f| second_column.get(&f))
         .sum()
 }
 
