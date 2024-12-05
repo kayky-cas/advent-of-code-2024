@@ -24,9 +24,9 @@ fn part1(input: &str) -> usize {
         })
         .filter(|v| {
             for i in 0..v.len() {
-                for y in i..v.len() {
-                    let Some(r) = rules.get(&v[i]) else { continue };
-                    if r.iter().any(|z| z == &v[y]) {
+                let Some(r) = rules.get(&v[i]) else { continue };
+                for y in v.iter().skip(i + 1) {
+                    if r.iter().any(|z| z == y) {
                         return false;
                     }
                 }
@@ -131,4 +131,3 @@ mod tests {
         assert_eq!(part2(INPUT), 123);
     }
 }
-
